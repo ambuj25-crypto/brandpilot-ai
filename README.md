@@ -36,7 +36,7 @@ Supabase Auth
 
 Google Generative AI SDK (Gemini Flash)
 
-🗺️ Product Roadmap (V2)
+🗺️ Product Roadmap (V2) this will updated later
 
 The current production build acts as the foundational SaaS layer. The upcoming Phase 2 architecture focuses on advanced data retrieval:
 
@@ -45,4 +45,6 @@ The current production build acts as the foundational SaaS layer. The upcoming P
 Vector Search Integration: Utilizing Supabase pgvector to store text chunk embeddings, allowing the Gemini model to dynamically query and cite the business's actual internal data when generating content.
 
 Automated Social Publishing: Integration with Meta/X APIs to auto-publish scheduled calendar rows.
+
+this will updated later
 
