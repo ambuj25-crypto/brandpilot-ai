@@ -1,6 +1,6 @@
-🚀 Antigravity AI (Content Studio SaaS)
+🚀  BRANDPILOT-AI (Content Studio SaaS)
 
-Antigravity AI is a multi-tenant Social Media Management SaaS designed for small business owners. It bridges the gap between generic AI text generation and highly personalized, actionable business strategy.
+Brandpilot-ai is a multi-tenant Social Media Management SaaS designed for small business owners. It bridges the gap between generic AI text generation and highly personalized, actionable business strategy.
 
 Instead of just generating text, Antigravity acts as a stateful, interactive Social Media Strategist that remembers your brand's unique context, negotiates strategies, and schedules content directly to a visual calendar.
 
