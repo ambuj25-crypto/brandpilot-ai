@@ -164,7 +164,7 @@ function AddPostForm({ onSuccess }: { onSuccess: () => void }) {
                 <div className="relative">
                   <select
                     value={platform}
-                    onChange={(e) => setPlatform(e.target.value)}
+                    onChange={(e) => setPlatform(e.target.value as any)}
                     className="w-full appearance-none bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer"
                   >
                     {PLATFORMS.map((p) => (
@@ -301,11 +301,10 @@ export default function CalendarClient({ initialPosts }: CalendarClientProps) {
                 {/* Date header */}
                 <div className="flex items-center gap-3 mb-3">
                   <div
-                    className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${
-                      isToday
+                    className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${isToday
                         ? "bg-purple-500/20 border border-purple-500/40 text-purple-300"
                         : "bg-white/5 border border-white/10 text-slate-400"
-                    }`}
+                      }`}
                   >
                     <Calendar className="h-3 w-3" />
                     {isToday ? "Today" : weekday} · {date}
