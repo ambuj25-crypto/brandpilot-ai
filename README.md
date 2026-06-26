@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🚀 Antigravity AI (Content Studio SaaS)
 
-## Getting Started
+Antigravity AI is a multi-tenant Social Media Management SaaS designed for small business owners. It bridges the gap between generic AI text generation and highly personalized, actionable business strategy.
 
-First, run the development server:
+Instead of just generating text, Antigravity acts as a stateful, interactive Social Media Strategist that remembers your brand's unique context, negotiates strategies, and schedules content directly to a visual calendar.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔒 Secure Multi-Tenant Authentication: Full user flow (Sign-up, Login, OAuth) powered by Supabase Auth with strict Row Level Security (RLS) protecting user data.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🧠 Business Context Engine: A persistent PostgreSQL database layer that stores brand profiles (Industry, Target Audience, Tone of Voice) to ensure AI output is perfectly tailored to each specific business.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+💬 Interactive AI Strategy Chat: A dynamic, multi-turn chat interface powered by the Google Gemini API. Users can brainstorm, negotiate pricing strategies, and refine content pillars before generating posts.
 
-## Learn More
+📅 Content Calendar System: Allows users to take AI-generated content and save it directly to a database, organized by scheduled dates and platforms.
 
-To learn more about Next.js, take a look at the following resources:
+🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Frontend:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Next.js 14+ (App Router)
 
-## Deploy on Vercel
+React & TypeScript
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Tailwind CSS (Styling & Dark Mode UI)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Lucide React (Icons)
+
+Backend & Database:
+
+Next.js API Routes (Serverless backend)
+
+Supabase (PostgreSQL Database)
+
+Supabase Auth
+
+Google Generative AI SDK (Gemini Flash)
+
+🗺️ Product Roadmap (V2)
+
+The current production build acts as the foundational SaaS layer. The upcoming Phase 2 architecture focuses on advanced data retrieval:
+
+[In Progress] RAG (Retrieval-Augmented Generation): Implementing a Knowledge Base feature where business owners can upload internal documents (Pricing PDFs, training guides, menus).
+
+Vector Search Integration: Utilizing Supabase pgvector to store text chunk embeddings, allowing the Gemini model to dynamically query and cite the business's actual internal data when generating content.
+
+Automated Social Publishing: Integration with Meta/X APIs to auto-publish scheduled calendar rows.
+
