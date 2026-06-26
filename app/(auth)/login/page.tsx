@@ -13,49 +13,117 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const supabase = createClient();
 
+  const switchMode = (next: AuthMode) => {
+    setMode(next);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+  };
+
+  // ── Sign In ────────────────────────────────────────────────────────────────
+  const handleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          setErrorMessage(
+            "Account not found or incorrect password. Please Sign Up."
+          );
+        } else {
+          setErrorMessage(error.message);
+        }
+        return;
+      }
+
+      // Success → clear error and go to dashboard
+      setErrorMessage(null);
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setErrorMessage("Something went wrong. Please try again.");
+    }
+  };
+
+  // ── Sign Up ────────────────────────────────────────────────────────────────
+  const handleSignUp = async () => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        if (error.message.includes("User already registered")) {
+          setErrorMessage("Account already exists. Please Sign In.");
+        } else {
+          setErrorMessage(error.message);
+        }
+        return;
+      }
+
+      // Supabase email enumeration protection:
+      // signup "succeeds" but identities is empty → email already registered
+      if (
+        data.user &&
+        data.user.identities &&
+        data.user.identities.length === 0
+      ) {
+        setErrorMessage("Account already exists. Please Sign In.");
+        return;
+      }
+
+      // ✅ If a session is returned, email confirmation is OFF — auto-login
+      if (data.session) {
+        setErrorMessage(null);
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
+      // Email confirmation is ON — user must verify first
+      setSuccessMessage("Check your email for the confirmation link!");
+    } catch {
+      setErrorMessage("Something went wrong. Please try again.");
+    }
+  };
+
+  // ── Form submit dispatcher ────────────────────────────────────────────────
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setMessage(null);
+    setErrorMessage(null);
+    setSuccessMessage(null);
 
     if (mode === "login") {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        router.push("/dashboard");
-        router.refresh();
-      }
+      await handleSignIn();
     } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-      });
-      if (error) {
-        setError(error.message);
-      } else {
-        setMessage("Check your email for the confirmation link!");
-      }
+      await handleSignUp();
     }
+
     setLoading(false);
   };
 
+  // ── Google OAuth ──────────────────────────────────────────────────────────
   const handleGoogleLogin = async () => {
     setLoading(true);
-    setError(null);
+    setErrorMessage(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) {
-      setError(error.message);
+      setErrorMessage(error.message);
       setLoading(false);
     }
   };
@@ -91,6 +159,49 @@ export default function LoginPage() {
           <p className="text-sm text-slate-400 mt-1">Your AI-powered social media platform</p>
         </div>
 
+        {/* ── Error Banner (above the card) ──────────────────────────────── */}
+        {errorMessage && (
+          <div
+            id="auth-error-banner"
+            role="alert"
+            className="bg-red-100 text-red-600 p-3 rounded-xl mb-4 flex items-start gap-3"
+          >
+            <svg
+              className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium">{errorMessage}</p>
+              {/* Quick-switch link */}
+              {mode === "login" && errorMessage.includes("Sign Up") && (
+                <button
+                  type="button"
+                  onClick={() => switchMode("signup")}
+                  className="mt-1 text-xs text-red-500 hover:text-red-700 underline underline-offset-2 transition-colors font-semibold"
+                >
+                  Switch to Sign Up →
+                </button>
+              )}
+              {mode === "signup" && errorMessage.includes("Sign In") && (
+                <button
+                  type="button"
+                  onClick={() => switchMode("login")}
+                  className="mt-1 text-xs text-red-500 hover:text-red-700 underline underline-offset-2 transition-colors font-semibold"
+                >
+                  Switch to Sign In →
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Card */}
         <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/40">
           {/* Mode toggle */}
@@ -98,7 +209,8 @@ export default function LoginPage() {
             {(["login", "signup"] as AuthMode[]).map((m) => (
               <button
                 key={m}
-                onClick={() => { setMode(m); setError(null); setMessage(null); }}
+                type="button"
+                onClick={() => switchMode(m)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                   mode === m
                     ? "bg-violet-600 text-white shadow-lg shadow-violet-600/30"
@@ -112,6 +224,7 @@ export default function LoginPage() {
 
           {/* Google OAuth */}
           <button
+            type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium py-3 px-4 rounded-xl transition-all duration-200 mb-6 group disabled:opacity-50 disabled:cursor-not-allowed"
@@ -172,21 +285,13 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Error / Success messages */}
-            {error && (
-              <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-red-400 text-xs">{error}</p>
-              </div>
-            )}
-            {message && (
+            {/* Success message */}
+            {successMessage && (
               <div className="flex items-start gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
                 <svg className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <p className="text-emerald-400 text-xs">{message}</p>
+                <p className="text-emerald-400 text-xs">{successMessage}</p>
               </div>
             )}
 
