@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Fail gracefully if Supabase env vars are not yet configured
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   ) {
     console.warn(
       "[middleware] Supabase env vars missing — skipping auth checks. " +
-        "Copy .env.example to .env.local and add your project credentials."
+      "Copy .env.example to .env.local and add your project credentials."
     );
     return NextResponse.next();
   }
